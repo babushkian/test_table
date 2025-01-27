@@ -2,13 +2,15 @@ import { useState } from "react";
 import {flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
 import DATA from "../../../data.js";
+import { EditableCell } from "../EditableCell/EditableCell.jsx";
+import { meta } from "@eslint/js";
 
 const columns = [
     {
         accessorKey: "task",
         header: "Task",
         size: 225,
-        cell: (props) => <p>{props.getValue()}</p>,
+        cell: EditableCell,
     },
     {
         accessorKey: "status",
@@ -29,8 +31,17 @@ const columns = [
 ];
 
 export const TaskTable = () => {
-    const [data, SetData] = useState(DATA);
-    const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
+    const [data, setData] = useState(DATA);
+    const table = useReactTable({ data, 
+        columns, 
+        getCoreRowModel: getCoreRowModel(),
+        meta: {
+            updateData: (rowIndex, columnId, value)=> setData(prev => prev.map(
+               (row, index) => index === rowIndex? {...prev[rowIndex], [columnId]: value} : row
+            ))
+        }
+
+     });
     console.log(table.getRowModel())
     return (
             <>
