@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import styles from "./SimpleTable.module.css"
 
 export const SimpleTable = ({data}) => {
     return (
@@ -8,7 +9,7 @@ export const SimpleTable = ({data}) => {
                 {/* Генерация заголовков таблицы на основе ключей первого объекта */}
                 {data.length > 0 &&
                     Object.keys(data[0]).map((key, index) => (
-                        <th key={index}>{key}</th>
+                        <th className={styles.th}  key={index}>{key}</th>
                     ))}
             </tr>
         </thead>
@@ -18,7 +19,7 @@ export const SimpleTable = ({data}) => {
                 <tr key={rowIndex}>
                     {/* Генерация ячеек строки на основе значений объекта */}
                     {Object.values(row).map((value, cellIndex) => (
-                        <td key={cellIndex}>{value}</td>
+                        <td className={styles.td} key={cellIndex}>{value}</td>
                     ))}
                 </tr>
             ))}

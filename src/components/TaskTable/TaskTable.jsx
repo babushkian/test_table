@@ -1,5 +1,7 @@
 import { useState } from "react";
 import {flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import styles from "./TaskTable.module.css"
+import DATA from "../../../data.js";
 
 const columns = [
     {
@@ -22,37 +24,40 @@ const columns = [
         accessorKey: "notes",
         header: "Notes",
         size: 225,
-        cell: (props) => <p>{props.getValue().name}</p>,
+        cell: (props) => <p>{props.getValue()}</p>,
     },
 ];
 
-const TaskTable = () => {
+export const TaskTable = () => {
     const [data, SetData] = useState(DATA);
     const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
+    console.log(table.getRowModel())
     return (
-        <Box>
-            <Box className="table" width={table.getTotalSize()}>
+            <>
+            
+            <div className={styles.table} style={{ width: table.getTotalSize()}}>
                 {table.getHeaderGroups().map((HeaderGroup) => (
-                    <Box className="tr" key={HeaderGroup.id}>
+                    <div className={styles.tr} key={HeaderGroup.id}>
                         {HeaderGroup.headers.map((header) => (
-                            <Box className="th" w={header.getSize()} key={header.id}>
+                            <div className={styles.th} style={{ width:header.getSize()}} key={header.id}>
                                 {header.column.columnDef.header}
-                                <Box className="resizer"></Box>
-                            </Box>
+                                <div className={styles.resizer}></div>
+                            </div>
                         ))}
-                    </Box>
+                    </div>
                 ))}
+
                 {table.getRowModel().rows.map((row) => (
-                    <Box className="tr" key={row.id}>
+                    <div className={styles.tr} key={row.id}>
                         {row.getVisibleCells().map((cell) => (
-                            <Box className="td" w={cell.column.getSize()} key={cell.id}>
+                            <div className={styles.td} style={{ width: cell.column.getSize()}} key={cell.id}>
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </Box>
+                            </div>
                         ))}
-                    </Box>
+                    </div>
                 ))}
-            </Box>
-        </Box>
+            </div>
+        </>
     );
 };
-export default TaskTable;
+

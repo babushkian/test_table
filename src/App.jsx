@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 import { getRawData } from "./services/api";
-import { SimpleTable } from "./components/SimpleTable";
+import { SimpleTable } from "./components/SimpleTable/SimpleTable";
+import { TaskTable } from "./components/TaskTable/TaskTable";
 import { DateDiapazon } from "./components/DateDiapazon";
 import { convertDate } from "./services/convertDate";
 
@@ -51,7 +52,8 @@ const App = () => {
             )}
 
             {loading && <p>Загрузка...</p>}
-            {data.length > 0 && !loading && <SimpleTable data={data} />}
+            {/* {data.length > 0 && !loading && <SimpleTable data={data} />} */}
+            {data.length > 0 && !loading && <TaskTable />}
         </div>
     );
 };
