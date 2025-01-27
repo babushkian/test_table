@@ -1,45 +1,57 @@
 // src/App.js
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import "./App.css";
 
 import { getRawData } from "./services/api";
-import "./App.css";
 import { SimpleTable } from "./components/SimpleTable";
 import { DateDiapazon } from "./components/DateDiapazon";
+import { convertDate } from "./services/convertDate";
 
 const App = () => {
-    const [dates, setDadtes] = useState(null);
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(false)
+    const [dates, setDates] = useState(null);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const handleDatesSubmit = (data) => {
-        setDadtes(data);
-        handleShowTable()
+    const handleDatesSubmit = (dates) => {
+        console.log("dates: ", dates)
+        setDates(dates);
+        handleShowTable();
     };
+    useEffect(() =>{
+        if (loading === false ) {
+            console.log("Загружаюсь. Или нет.")
+        }
+    },
+    [loading])
+
+    const setParentDates = (dates) => {setDates(dates)}
 
     async function handleShowTable() {
-        setLoading(true)
+        setLoading(true);
         try {
-            const response = await getRawData(
-                dates.startDate.toISOString().split('T')[0],
-                dates.endDate.toISOString().split('T')[0]
-            )
-            setData(response.data.data)
+            const response = await getRawData(convertDate(dates.startDate), convertDate(dates.endDate));
+            setData(response.data.data);
         } catch (err) {
-            console.error('Ошибка при получении данных:', err)
+            console.error("Ошибка при получении данных:", err);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     }
 
     return (
         <div className="App">
             <h1>Выберите даты для формирования отчёта</h1>
-            <DateDiapazon onSubmit={handleDatesSubmit} />
+            <DateDiapazon onSubmit={handleDatesSubmit} setParentDates={setParentDates}/>
             {/* {dates?  dates.map((date, index) => <p key={index}>{date}</p>): "даты отсутствуют"} */}
-            {dates ? Object.keys(dates).map((d, index) => <p key={index}>{dates[d].toISOString()}</p>) : <p>даты отсутствуют</p>}
+            {dates ? (
+                Object.keys(dates).map((d, index) => <p key={index}>{dates[d]? convertDate(dates[d]): ""}</p>)
+            ) : (
+                <p>даты отсутствуют</p>
+            )}
 
             {loading && <p>Загрузка...</p>}
-            {data.length > 0 && !loading &&  <SimpleTable data={data} />} 
+            {data.length > 0 && !loading && <SimpleTable data={data} />}
         </div>
     );
 };

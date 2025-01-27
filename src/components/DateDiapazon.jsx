@@ -2,52 +2,40 @@ import DatePickerComponent from "./DatePicker";
 
 import { useState } from "react";
 
-export const DateDiapazon = ({ onSubmit }) => {
+export const DateDiapazon = ({ onSubmit, setParentDates}) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [error, setError] = useState("");
 
-    // //
-    // const handleDatesChange = (date) => {
-    //     setStartDate(date)
-    //     if (endDate && date > endDate) {
-    //         setError('Дата начала не может быть позже даты окончания')
-    //     } else {
-    //         setError('')
-    //     }
-    // }
+    function compareDates(date, otherDate, greater = true) {
+        let result = null;
+        if (otherDate) {
+            result = greater ? date > otherDate : otherDate > date;
+        }
 
-    // // Проверка на корректность дат
-    // const handleStartDateChange = (date) => {
-    //     setStartDate(date)
-    //     if (endDate && date > endDate) {
-    //         setError('Дата начала не может быть позже даты окончания')
-    //     } else {
-    //         setError('')
-    //     }
-    // }
-
-    function compareDates() {
-        // if (startDate && endDate && startDate > endDate) {
-        if (startDate && endDate && startDate > endDate) {
+        if (result) {
             setError("Дата окончания не может быть раньше даты начала");
         } else {
             setError("");
         }
     }
+
     const handleStartDate = (date) => {
         setStartDate(date);
-        compareDates();
+        setParentDates({startDate: date, endDate})
+        compareDates(date, endDate, true);
     };
 
     const handleEndDate = (date) => {
         setEndDate(date);
-        compareDates();
+        setParentDates({startDate, endDate: date})
+        compareDates(date, startDate, false);
     };
 
     const handleSubmit = () => {
         onSubmit({ startDate, endDate });
     };
+    
     const isDateRangeValid = startDate && endDate && !error;
 
     return (
@@ -55,11 +43,13 @@ export const DateDiapazon = ({ onSubmit }) => {
             <div className="input-container">
                 <div className={`date-picker-container ${error ? "error" : ""}`}>
                     <label>Начало</label>
-                    <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} maxDate={endDate} />
+                    {/* <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} maxDate={endDate} /> */}
+                    <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} />
                 </div>
                 <div className={`date-picker-container ${error ? "error" : ""}`}>
                     <label>Окончание</label>
-                    <DatePickerComponent selectedDate={endDate} onChange={handleEndDate} minDate={startDate} />
+                    {/* <DatePickerComponent selectedDate={endDate} onChange={handleEndDate} minDate={startDate} /> */}
+                    <DatePickerComponent selectedDate={endDate} onChange={handleEndDate}  />
                 </div>
             </div>
 
@@ -70,8 +60,8 @@ export const DateDiapazon = ({ onSubmit }) => {
                     <div className="buttons">
                         <button onClick={handleSubmit}>Показать таблицу</button>
                     </div>
-                </>)
-            }
+                </>
+            )}
         </>
     );
 };
