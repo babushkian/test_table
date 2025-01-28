@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import {flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
 // import DATA from "../../../data.js";
-import DATA from "../../../fake_dataset.js";
+// import DATA from "../../../fake_dataset.js";
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
 import { meta } from "@eslint/js";
@@ -37,30 +37,19 @@ import { meta } from "@eslint/js";
 
 
 
-const defined_columns = [
-    {accessorKey: "controller", header: "Контролер", cell: (props) => <p>{props.getValue()}</p>},
-    {accessorKey: "id", header: "№", cell: (props) => <p>{props.getValue()}</p>},
-    {accessorKey: "remark", header: "Замечание", cell: (props) => <p>{props.getValue()}</p>},
-    {accessorKey: "remark_datetime", header: "Дата замечания", cell: (props) => <p>{props.getValue()}</p>},
-    {accessorKey: "shift_task", header: "сменное задение", cell: (props) => <p>{props.getValue()}</p>},
-]
-
-
 
 
 
 
 export const TaskTable = ({data, columns}) => {
     const [tabledata, setData] = useState(data);
-    const mydata = useRef(data)
 
-    // const table_columns = Object.keys(columns).map(key=>{
-    //     return { accessorKey: key, header: columns[key], cell: (props) => <p>{props.getValue()}</p>,}
-    // })
-    // console.log("колонки", table_columns)
+    const table_columns = Object.keys(columns).map(key=>{
+        return { accessorKey: key, header: columns[key], cell: (props) => <p>{props.getValue()}</p>,}
+    })
 
-    const table = useReactTable({ DATA, 
-        defined_columns,
+    const table = useReactTable({data: data, 
+        columns: table_columns,
         getCoreRowModel: getCoreRowModel(),
         // meta: {
         //     updateData: (rowIndex, columnId, value)=> setData(prev => prev.map(
@@ -68,7 +57,8 @@ export const TaskTable = ({data, columns}) => {
         //     ))
         // }
      });
-    console.log(table.getRowModel())
+    console.log("ряды", table.getRowModel())
+
     return (
             <>
 

@@ -43,15 +43,7 @@ const App = () => {
         <div className="App">
             <h1>Выберите даты для формирования отчёта</h1>
             <DateDiapazon onSubmit={handleDatesSubmit} setParentDates={setParentDates}/>
-            {/* {dates?  dates.map((date, index) => <p key={index}>{date}</p>): "даты отсутствуют"} */}
-            {dates ? (
-                Object.keys(dates).map((d, index) => <p key={index}>{dates[d]? convertDate(dates[d]): ""}</p>)
-            ) : (
-                <p>даты отсутствуют</p>
-            )}
-
             {loading && <p>Загрузка...</p>}
-            {/* {data.length > 0 && !loading && <SimpleTable data={data} />} */}
             {data?.data  && !loading && <TaskTable data={data.data} columns={data.columns} />}
         </div>
     );

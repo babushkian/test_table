@@ -43,13 +43,12 @@ export const DateDiapazon = ({ onSubmit, setParentDates}) => {
             <div className="input-container">
                 <div className={`date-picker-container ${error ? "error" : ""}`}>
                     <label>Начало</label>
-                    {/* <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} maxDate={endDate} /> */}
-                    <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} />
+                    <DatePickerComponent selectedDate={startDate} onChange={handleStartDate} maxDate={endDate} />
                 </div>
                 <div className={`date-picker-container ${error ? "error" : ""}`}>
                     <label>Окончание</label>
-                    {/* <DatePickerComponent selectedDate={endDate} onChange={handleEndDate} minDate={startDate} /> */}
-                    <DatePickerComponent selectedDate={endDate} onChange={handleEndDate}  />
+                    <DatePickerComponent selectedDate={endDate} onChange={handleEndDate} minDate={startDate} />
+                    
                 </div>
             </div>
 
