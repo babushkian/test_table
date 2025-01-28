@@ -1,5 +1,5 @@
 .table {
-    border: 1px solid #424242;
+    /* border: 1px solid #424242; */
 }
 
 .tr {
@@ -32,6 +32,7 @@
 }
 
 .th {
+    border: 1px solid black;
     position: relative;
     display: flex;
     justify-content: center;

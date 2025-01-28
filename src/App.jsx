@@ -15,13 +15,12 @@ const App = () => {
     const [loading, setLoading] = useState(false);
 
     const handleDatesSubmit = (dates) => {
-        console.log("dates: ", dates)
         setDates(dates);
         handleShowTable();
     };
     useEffect(() =>{
         if (loading === false ) {
-            console.log("Загружаюсь. Или нет.")
+            console.log("Состояние загрузки:", loading)
         }
     },
     [loading])
@@ -53,7 +52,7 @@ const App = () => {
 
             {loading && <p>Загрузка...</p>}
             {/* {data.length > 0 && !loading && <SimpleTable data={data} />} */}
-            {data.length > 0 && !loading && <TaskTable />}
+            {data.length > 0 && !loading && <TaskTable DATA={data} />}
         </div>
     );
 };

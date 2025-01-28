@@ -1,37 +1,69 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
-import DATA from "../../../data.js";
+// import DATA from "../../../data.js";
+// import DATA from "../../../fake_dataset.js";
+
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
 import { meta } from "@eslint/js";
 
-const columns = [
-    {
-        accessorKey: "task",
-        header: "Task",
-        size: 225,
-        cell: EditableCell,
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: (props) => <p>{props.getValue()?.name}</p>,
-    },
-    {
-        accessorKey: "due",
-        header: "Due",
-        cell: (props) => <p>{props.getValue()?.toLocaleTimeString()}</p>,
-    },
-    {
-        accessorKey: "notes",
-        header: "Notes",
-        size: 225,
-        cell: (props) => <p>{props.getValue()}</p>,
-    },
-];
 
-export const TaskTable = () => {
+
+// const columns = [
+//     {
+//         accessorKey: "task",
+//         header: "Task",
+//         size: 225,
+//         cell: EditableCell,
+//     },
+//     {
+//         accessorKey: "status",
+//         header: "Status",
+//         cell: (props) => <p>{props.getValue()?.name}</p>,
+//     },
+//     {
+//         accessorKey: "due",
+//         header: "Due",
+//         cell: (props) => <p>{props.getValue()?.toLocaleTimeString()}</p>,
+//     },
+//     {
+//         accessorKey: "notes",
+//         header: "Notes",
+//         size: 225,
+//         cell: (props) => <p>{props.getValue()}</p>,
+//     },
+// ];
+
+
+
+
+// const columns = [
+//     {accessorKey: "controller", header: "Контролер", cell: (props) => <p>{props.getValue()}</p>},
+//     {accessorKey: "id", header: "№", cell: (props) => <p>{props.getValue()}</p>},
+//     {accessorKey: "remark", header: "Замечание", cell: (props) => <p>{props.getValue()}</p>},
+//     {accessorKey: "remark_datetime", header: "Дата замечания", cell: (props) => <p>{props.getValue()}</p>},
+//     {accessorKey: "shift_task", header: "сменное задение", cell: (props) => <p>{props.getValue()}</p>},
+// ]
+
+
+
+
+
+
+export const TaskTable = ({DATA}) => {
     const [data, setData] = useState(DATA);
+    const mydata = useRef(DATA)
+
+    // console.log("данные в состоянии", data)
+    // console.log("чистые данные, пришедшие в компонент таблицы", DATA)
+    // console.log("ref на данные, пришедшие в компонент таблицы", mydata)
+    // console.log("длина ланных", mydata.current.length)
+
+    const columns = Object.keys(data[0]).map(key=>{
+        return { accessorKey: key, header: key, cell: (props) => <p>{props.getValue()}</p>,}
+    })
+    console.log("колонки", columns)
+
     const table = useReactTable({ data, 
         columns, 
         getCoreRowModel: getCoreRowModel(),
@@ -71,4 +103,3 @@ export const TaskTable = () => {
         </>
     );
 };
-

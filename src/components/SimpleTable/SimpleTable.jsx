@@ -1,7 +1,12 @@
 import PropTypes from 'prop-types';
 import styles from "./SimpleTable.module.css"
+import { useRef } from 'react';
 
 export const SimpleTable = ({data}) => {
+    const mydata = useRef(data)
+    console.log("чистые данные, пришедшие в компонент таблицы", data)
+    console.log("ref на данные, пришедшие в компонент таблицы", mydata)
+    console.log("длина ланных", mydata.current.length)
     return (
         <table>
         <thead>
