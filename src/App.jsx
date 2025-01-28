@@ -11,7 +11,7 @@ import { convertDate } from "./services/convertDate";
 
 const App = () => {
     const [dates, setDates] = useState(null);
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const handleDatesSubmit = (dates) => {
@@ -31,14 +31,14 @@ const App = () => {
         setLoading(true);
         try {
             const response = await getRawData(convertDate(dates.startDate), convertDate(dates.endDate));
-            setData(response.data.data);
+            setData(response.data);
         } catch (err) {
             console.error("Ошибка при получении данных:", err);
         } finally {
             setLoading(false);
         }
     }
-
+    // console.log("данные", data)
     return (
         <div className="App">
             <h1>Выберите даты для формирования отчёта</h1>
@@ -52,7 +52,7 @@ const App = () => {
 
             {loading && <p>Загрузка...</p>}
             {/* {data.length > 0 && !loading && <SimpleTable data={data} />} */}
-            {data.length > 0 && !loading && <TaskTable DATA={data} />}
+            {data?.data  && !loading && <TaskTable data={data.data} columns={data.columns} />}
         </div>
     );
 };
