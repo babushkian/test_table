@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
-import {flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { useMemo, useRef, useState } from "react";
+import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
 // import DATA from "../../../data.js";
 // import DATA from "../../../fake_dataset.js";
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
-import { meta } from "@eslint/js";
+import { Filters } from "../Filters/Filters.jsx"
+
 
 
 
@@ -37,53 +38,64 @@ import { meta } from "@eslint/js";
 
 
 
-
-
-
-
 export const TaskTable = ({data, columns}) => {
     const [tabledata, setData] = useState(data);
+    const [sorting, setSorting] = useState([])
+    const [columnFilters, setColumnFilters] = useState([])
 
-    const table_columns = Object.keys(columns).map(key=>{
+    const defineColumns = () => Object.keys(columns).map(key=>{
         return { accessorKey: key, header: columns[key], cell: (props) => <p>{props.getValue()}</p>,}
     })
+
+    // чтобы заголовок не перерисовывался в случае обновления data
+    const table_columns = useMemo(defineColumns, []); //не зависимостей, будет отрисован один раз
 
     const table = useReactTable({data: data, 
         columns: table_columns,
         getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        state: {
+            columnFilters
+        },
+        
         // meta: {
         //     updateData: (rowIndex, columnId, value)=> setData(prev => prev.map(
         //        (row, index) => index === rowIndex? {...prev[rowIndex], [columnId]: value} : row
         //     ))
         // }
+        // debugTable: true,
+        // debugHeaders: true,
+        // debugColumns: false,
      });
     console.log("ряды", table.getRowModel())
 
     return (
             <>
-
-            <div className={styles.table} style={{ width: table.getTotalSize()}}>
+            <Filters columnFilters = {columnFilters} setColumnFilters = {setColumnFilters} />
+            <table className={styles.table} style={{ width: table.getTotalSize()}}>
                 {table.getHeaderGroups().map((HeaderGroup) => (
-                    <div className={styles.tr} key={HeaderGroup.id}>
+                    <tr className={styles.tr} key={HeaderGroup.id}>
                         {HeaderGroup.headers.map((header) => (
-                            <div className={styles.th} style={{ width:header.getSize()}} key={header.id}>
+                            <th className={styles.th} style={{ width:header.getSize()}} key={header.id}>
                                 {header.column.columnDef.header}
                                 <div className={styles.resizer}></div>
-                            </div>
+                            </th>
                         ))}
-                    </div>
+                    </tr>
                 ))}
 
                 {table.getRowModel().rows.map((row) => (
-                    <div className={styles.tr} key={row.id}>
+                    <tr className={styles.tr} key={row.id}>
                         {row.getVisibleCells().map((cell) => (
-                            <div className={styles.td} style={{ width: cell.column.getSize()}} key={cell.id}>
+                            <td className={styles.td} style={{ width: cell.column.getSize()}} key={cell.id}>
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </div>
+                            </td>
                         ))}
-                    </div>
+                    </tr>
                 ))}
-            </div>
+            </table>
+            
         </>
     );
 };

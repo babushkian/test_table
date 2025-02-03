@@ -1,5 +1,6 @@
 .table {
     /* border: 1px solid #424242; */
+    border-collapse: collapse;
 }
 
 .tr {

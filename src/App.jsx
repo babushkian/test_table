@@ -7,6 +7,7 @@ import { getRawData } from "./services/api";
 import { SimpleTable } from "./components/SimpleTable/SimpleTable";
 import { TaskTable } from "./components/TaskTable/TaskTable";
 import { DateDiapazon } from "./components/DateDiapazon";
+
 import { convertDate } from "./services/convertDate";
 
 const App = () => {
@@ -46,6 +47,7 @@ const App = () => {
             {loading && <p>Загрузка...</p>}
             {data?.data  && !loading && <TaskTable data={data.data} columns={data.columns} />}
         </div>
+
     );
 };
 
