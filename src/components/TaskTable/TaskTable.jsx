@@ -36,6 +36,22 @@ import { Filters } from "../Filters/Filters.jsx"
 // ];
 
 
+const defaultFilter = (row, columnId, filterValue) => {
+    const filterValueLower = String(filterValue).toLowerCase();
+    const valueString = String(row.getValue(columnId));
+    if (!isNaN(Number(row.getValue(columnId)))) {
+        return valueString.includes(filterValueLower);
+      }
+    return valueString.toLowerCase().includes(filterValueLower);
+}
+
+
+const statusSortFn = (rowA, rowB, _columnId) => {
+    const statusA = rowA.original.status
+    const statusB = rowB.original.status
+    const statusOrder = ["сделано", "отменено", "в процессе", "ожидает"]
+    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB)
+}
 
 
 export const TaskTable = ({data, columns}) => {
@@ -44,20 +60,20 @@ export const TaskTable = ({data, columns}) => {
     const [columnFilters, setColumnFilters] = useState([])
     console.log("порядок колонок:", columns)
     const defineColumns = () => Object.keys(columns).map(key=>{
-        return { accessorKey: key, 
-                header: columns[key], 
-                cell: (props) => <p>{props.getValue()}</p>,
-                filterFn: (row, columnId, filterValue) => {
-                    const filterValueLower = String(filterValue).toLowerCase();
-                    const valueString = String(row.getValue(columnId));
-                    if (!isNaN(Number(row.getValue(columnId)))) {
-                        return valueString.includes(filterValueLower);
-                      }
-                    return valueString.toLowerCase().includes(filterValueLower);
-                },
-                enableSorting: true,
+        const sortableColumn = key ==="remark" ? false: true 
+        
+        
+        const columnDict = { accessorKey: key, 
+            header: columns[key], 
+            cell: (props) => <p>{props.getValue()}</p>,
+            filterFn: defaultFilter,
+            enableSorting: sortableColumn,
+        }
+        if (key==="status") {
+            columnDict["sortingFn"] = statusSortFn;
+        }
 
-            }
+        return columnDict
     })
 
     // чтобы заголовок не перерисовывался в случае обновления data
