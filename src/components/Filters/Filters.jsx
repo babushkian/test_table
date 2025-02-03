@@ -1,12 +1,17 @@
-export function Filters({columnFilters, setColumnFilters}) {
-    console.log("columnFilters", columnFilters)
-    const controllerName = columnFilters.find((f) => f.id === "controller")?.value || "";
-    
+import styles from "./Filters.module.css"
+
+export function Filters({columnFilters, setColumnFilters, columnId}) {
+    // console.log("columnFilters", columnFilters)
+    // console.log("columnId", columnId)
+    const controllerName = columnFilters.find((f) => f.id === columnId)?.value || "";
+
     const onFilterchange = (id, value) =>
         setColumnFilters((prev) => prev.filter((f) => f.id !== id).concat({ id, value }));
+
+    // console.log(columnFilters)
     return (
         <div>
-            <input value={controllerName} onChange={(e)=>onFilterchange("controller", e.target.value)} />
+            <input className ={styles["filter-input"]} value={controllerName} onChange={(e) => onFilterchange(columnId, e.target.value)} />
         </div>
     );
 }

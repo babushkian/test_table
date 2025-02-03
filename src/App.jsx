@@ -19,12 +19,7 @@ const App = () => {
         setDates(dates);
         handleShowTable();
     };
-    useEffect(() =>{
-        if (loading === false ) {
-            console.log("Состояние загрузки:", loading)
-        }
-    },
-    [loading])
+
 
     const setParentDates = (dates) => {setDates(dates)}
 
@@ -39,7 +34,7 @@ const App = () => {
             setLoading(false);
         }
     }
-    // console.log("данные", data)
+  
     return (
         <div className="App">
             <h1>Выберите даты для формирования отчёта</h1>
