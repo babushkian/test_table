@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns } from "@tanstack/react-table";
+import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns, getSortedRowModel } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
 // import DATA from "../../../data.js";
 // import DATA from "../../../fake_dataset.js";
@@ -42,7 +42,7 @@ export const TaskTable = ({data, columns}) => {
     const [tabledata, setData] = useState(data);
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
-
+    console.log("порядок колонок:", columns)
     const defineColumns = () => Object.keys(columns).map(key=>{
         return { accessorKey: key, 
                 header: columns[key], 
@@ -50,13 +50,12 @@ export const TaskTable = ({data, columns}) => {
                 filterFn: (row, columnId, filterValue) => {
                     const filterValueLower = String(filterValue).toLowerCase();
                     const valueString = String(row.getValue(columnId));
-                    console.log("фильтруемые значения", filterValueLower.valueOf(), valueString.valueOf())
                     if (!isNaN(Number(row.getValue(columnId)))) {
                         return valueString.includes(filterValueLower);
                       }
                     return valueString.toLowerCase().includes(filterValueLower);
-                    
                 },
+                enableSorting: true,
 
             }
     })
@@ -68,6 +67,7 @@ export const TaskTable = ({data, columns}) => {
         columns: table_columns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
         state: {
             columnFilters
@@ -96,7 +96,13 @@ export const TaskTable = ({data, columns}) => {
                         {HeaderGroup.headers.map((header) => (
                             <th className={styles.th} style={{ width:header.getSize()}} key={header.id}>
                                 <div>
-                                    <div>{header.column.columnDef.header}</div>
+                                    <div><span onClick={header.column.getToggleSortingHandler()}>{header.column.columnDef.header}</span>
+                                        {{
+                                            asc: ' 🔼',
+                                            desc: ' 🔽',
+                                        }[header.column.getIsSorted()]}
+                                    </div>
+                                    
                                     <div><Filters columnFilters = {columnFilters} setColumnFilters = {setColumnFilters} columnId = {header.column.id} /></div>
                                 </div>
                                 <div className={styles.resizer}></div>
