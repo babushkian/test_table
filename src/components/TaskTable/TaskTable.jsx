@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns, getSortedRowModel } from "@tanstack/react-table";
+import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns, getSortedRowModel, getPaginationRowModel } from "@tanstack/react-table";
 import styles from "./TaskTable.module.css"
 // import DATA from "../../../data.js";
 // import DATA from "../../../fake_dataset.js";
@@ -58,6 +58,8 @@ export const TaskTable = ({data, columns}) => {
     const [tabledata, setData] = useState(data);
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
+    const [pagination, setPagination] = useState({pageSize: 10, pageIndex: 0})
+
     console.log("порядок колонок:", columns)
     const defineColumns = () => Object.keys(columns).map(key=>{
         const sortableColumn = key ==="remark" ? false: true 
@@ -65,7 +67,7 @@ export const TaskTable = ({data, columns}) => {
         
         const columnDict = { accessorKey: key, 
             header: columns[key], 
-            cell: (props) => <p>{props.getValue()}</p>,
+            cell: (props) => <span>{props.getValue()}</span>,
             filterFn: defaultFilter,
             enableSorting: sortableColumn,
         }
@@ -84,9 +86,12 @@ export const TaskTable = ({data, columns}) => {
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
         onColumnFiltersChange: setColumnFilters,
+        onPaginationChange: setPagination,
         state: {
-            columnFilters
+            columnFilters,
+            pagination, // нужно именно так называть переменную, иначе он не присваивает ей новые значения
         },
         
         // meta: {
@@ -140,6 +145,12 @@ export const TaskTable = ({data, columns}) => {
                 ))}
                 </tbody>
             </table>
+            <br></br>
+            <span> Страница {table.getState().pagination.pageIndex + 1} из {table.getPageCount()}</span>
+            <div>
+                <button onClick={table.previousPage} disabled={!table.getCanPreviousPage()}> &lt; </button>
+                <button onClick={table.nextPage} disabled={!table.getCanNextPage()}> &gt; </button>
+            </div>
             
         </>
     );
