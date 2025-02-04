@@ -1,13 +1,20 @@
 import { useMemo, useRef, useState } from "react";
-import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns, getSortedRowModel, getPaginationRowModel } from "@tanstack/react-table";
-import { useVirtualizer } from '@tanstack/react-virtual';
-import styles from "./TaskTable.module.css"
+import {
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+    getFilteredRowModel,
+    filterFns,
+    getSortedRowModel,
+    getPaginationRowModel,
+} from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import styles from "./TaskTable.module.css";
 // import DATA from "../../../data.js";
 // import DATA from "../../../fake_dataset.js";
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
-import { Filters } from "../Filters/Filters.jsx"
-
+import { Filters } from "../Filters/Filters.jsx";
 
 // const columns = [
 //     {
@@ -41,59 +48,61 @@ const defaultFilter = (row, columnId, filterValue) => {
     const valueString = String(row.getValue(columnId));
     if (!isNaN(Number(row.getValue(columnId)))) {
         return valueString.includes(filterValueLower);
-      }
+    }
     return valueString.toLowerCase().includes(filterValueLower);
-}
+};
 
 // функция для кастомной сортировки по статусам
 const statusSortFn = (rowA, rowB, _columnId) => {
-    const statusA = rowA.original.status
-    const statusB = rowB.original.status
-    const statusOrder = ["сделано", "отменено", "в процессе", "ожидает"]
-    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB)
-}
+    const statusA = rowA.original.status;
+    const statusB = rowB.original.status;
+    const statusOrder = ["сделано", "отменено", "в процессе", "ожидает"];
+    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
+};
 
-
-export const TaskTable = ({data, columns}) => {
+export const TaskTable = ({ data, columns }) => {
     const [tabledata, setData] = useState(data);
-    const [sorting, setSorting] = useState([])
-    const [columnFilters, setColumnFilters] = useState([])
-    const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
-    const parentRef = useRef(null)
+    const [sorting, setSorting] = useState([]);
+    const [columnFilters, setColumnFilters] = useState([]);
+    // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
+    const parentRef = useRef(null);
 
+    const defineColumns = () =>
+        Object.keys(columns).map((key) => {
+            const sortableColumn = key === "remark" ? false : true;
+            const columnDict = {
+                accessorKey: key,
+                header: columns[key],
+                cell: (props) => <span>{props.getValue()}</span>,
+                filterFn: defaultFilter,
+                enableSorting: sortableColumn,
+            };
+            if (key === "status") {
+                columnDict["sortingFn"] = statusSortFn;
+            }
 
-    const defineColumns = () => Object.keys(columns).map(key=>{
-        const sortableColumn = key ==="remark" ? false: true 
-        const columnDict = { 
-            accessorKey: key, 
-            header: columns[key], 
-            cell: (props) => <span>{props.getValue()}</span>,
-            filterFn: defaultFilter,
-            enableSorting: sortableColumn,
-        }
-        if (key==="status") {
-            columnDict["sortingFn"] = statusSortFn;
-        }
-
-        return columnDict
-    })
+            return columnDict;
+        });
 
     // чтобы заголовок не перерисовывался в случае обновления data
     const table_columns = useMemo(defineColumns, []); //не зависимостей, будет отрисован один раз
 
-    const table = useReactTable({data: data, 
+    const table = useReactTable({
+        data: data,
         columns: table_columns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         onColumnFiltersChange: setColumnFilters,
-        onPaginationChange: setPagination,
+        // onSortingChange: setSorting, // это работает в связке с sorting в state но если сортировка определена отдельно, как у меня, то работает и без этого
+        getSortedRowModel: getSortedRowModel(),
+        //getPaginationRowModel: getPaginationRowModel(),
+        // onPaginationChange: setPagination,
         state: {
             columnFilters,
-            pagination, // нужно именно так называть переменную, иначе он не присваивает ей новые значения
+            //sorting, // нужно или нет? без него нормально работает
+            //pagination, // нужно именно так называть переменную, иначе он не присваивает ей новые значения
         },
-        
+
         // meta: {
         //     updateData: (rowIndex, columnId, value)=> setData(prev => prev.map(
         //        (row, index) => index === rowIndex? {...prev[rowIndex], [columnId]: value} : row
@@ -102,56 +111,78 @@ export const TaskTable = ({data, columns}) => {
         debugTable: true,
         // debugHeaders: true,
         // debugColumns: false,
-     });
-    // console.log("ряды", table.getRowModel())
-    // console.log("таблица", table.getLeafHeaders())
-    // console.log("таблица", table.getHeaderGroups()[0])
+    });
+
+    const { rows } = table.getRowModel();
+    const virtualizer = useVirtualizer({
+        count: rows.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 15,
+        overscan: 10,
+    });
+    console.log(rows);
+    console.log(virtualizer);
 
     return (
-            <div ref={parentRef} className={styles.container}>
-            
-            <table className={styles.table} style={{ width: table.getTotalSize()}}>
-                <thead>
-                {table.getHeaderGroups().map((HeaderGroup) => (
-                    <tr className={styles.tr} key={HeaderGroup.id}>
-                        {HeaderGroup.headers.map((header) => (
-                            <th className={styles.th} style={{ width:header.getSize()}} key={header.id}>
-                                <div>
-                                    <div><span onClick={header.column.getToggleSortingHandler()}>{header.column.columnDef.header}</span>
-                                        {{
-                                            asc: ' 🔼',
-                                            desc: ' 🔽',
-                                        }[header.column.getIsSorted()]}
-                                    </div>
-                                    
-                                    <div><Filters columnFilters = {columnFilters} setColumnFilters = {setColumnFilters} columnId = {header.column.id} /></div>
-                                </div>
-                                <div className={styles.resizer}></div>
+        <div ref={parentRef} className={styles.table_wrapper} style={{ height: "500px" }}>
+            {/* <div className={styles.table_wrapper} style={{ height: `${virtualizer.getTotalSize()}px`}}> */}
+            {/* <div className={styles.table_wrapper} style={{height:"400px"}}> */}
 
-                            </th>
-                        ))}
-                    </tr>
-                ))}
-                </thead>    
+            <table className={styles.table}>
+                <thead>
+                    {table.getHeaderGroups().map((HeaderGroup) => (
+                        <tr className={styles.tr} key={HeaderGroup.id}>
+                            {HeaderGroup.headers.map((header) => (
+                                <th className={styles.th} style={{ width: header.getSize() }} key={header.id}>
+                                    <div>
+                                        <div>
+                                            <span onClick={header.column.getToggleSortingHandler()}>
+                                                {header.column.columnDef.header}
+                                            </span>
+                                            {
+                                                {
+                                                    asc: " 🔼",
+                                                    desc: " 🔽",
+                                                }[header.column.getIsSorted()]
+                                            }
+                                        </div>
+
+                                        <div>
+                                            <Filters
+                                                columnFilters={columnFilters}
+                                                setColumnFilters={setColumnFilters}
+                                                columnId={header.column.id}
+                                            />
+                                        </div>
+                                    </div>
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
+                </thead>
                 <tbody>
-                {table.getRowModel().rows.map((row) => (
-                    <tr className={styles.tr} key={row.id}>
-                        {row.getVisibleCells().map((cell) => (
-                            <td className={styles.td} style={{ width: cell.column.getSize()}} key={cell.id}>
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </td>
-                        ))}
-                    </tr>
-                ))}
+                    {virtualizer.getVirtualItems().map((virtualRow, index) => {
+                        const row = rows[virtualRow.index];
+                        return (
+                            <tr
+                                key={row.id}
+                                style={{
+                                    height: `${virtualRow.size}px`,
+                                    transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+                                }}
+                            >
+                                {row.getVisibleCells().map((cell) => {
+                                    return (
+                                        <td key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
-            <br></br>
-            <span> Страница {table.getState().pagination.pageIndex + 1} из {table.getPageCount()}</span>
-            <div>
-                <button onClick={table.previousPage} disabled={!table.getCanPreviousPage()}> &lt; </button>
-                <button onClick={table.nextPage} disabled={!table.getCanNextPage()}> &gt; </button>
-            </div>
-            
         </div>
     );
 };

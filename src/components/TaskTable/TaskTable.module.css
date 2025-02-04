@@ -1,12 +1,10 @@
+
 .table {
-    /* border: 1px solid #424242; */
     border-collapse: collapse;
 }
 
 .tr {
-    display: flex;
-    flex-direction: row;
-    width: fit-content;
+
 }
 
 .polochka {
@@ -27,17 +25,15 @@
 
 .th {
     border: 1px solid black;
-    position: relative;
-    display: flex;
     justify-content: center;
     align-items: center;
     color: gray.400;
     padding: 0.5rem;
-    font-weight: bold;
-    font-size: xs;
+    font-weight:600;
     text-transform: uppercase;
     text-align: center;
   }
+  
   
 .container {
     margin: 1rem auto;
@@ -46,4 +42,8 @@
     justify-content: center;
     align-items: center;
 
+}
+.table_wrapper {
+    overflow: auto;
+    border: 1px solid black;
 }
