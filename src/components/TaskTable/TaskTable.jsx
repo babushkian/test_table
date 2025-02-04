@@ -64,8 +64,13 @@ export const TaskTable = ({ data, columns }) => {
     const [tabledata, setData] = useState(data);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
+    const [cellEditing, setCellEditing] = useState({rowIndex: null, columnId: null})
     // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
     const parentRef = useRef(null);
+
+    const handleEdit = (rowIndex, columnId) => {
+        setCellEditing({rowIndex, columnId})
+    }
 
     const defineColumns = () =>
         Object.keys(columns).map((key) => {
@@ -73,9 +78,21 @@ export const TaskTable = ({ data, columns }) => {
             const columnDict = {
                 accessorKey: key,
                 header: columns[key],
-                cell: (props) => <span>{props.getValue()}</span>,
                 filterFn: defaultFilter,
                 enableSorting: sortableColumn,
+                cell: (props) => <span>{props.getValue()}</span>,
+                // я хочу сделать редер, чтобы при нажатии в ячейке появлялась трока ввода, в остальных случаях просто текст
+                // не рендерится, уходит в бесконечную загрузку                    
+                // cell: ({row, column, getValue}) =>{
+                //     const isEditing  = cellEditing.rowIndex === row.original.id && cellEditing.columnId === column.id;
+                //     return isEditing? (
+                //         <input></input>    
+                //     ) : (
+                //         <span onclick={handleEdit(row.original.id, column.id)} >{getValue()}</span>
+                //     )
+                //} 
+
+
             };
             if (key === "status") {
                 columnDict["sortingFn"] = statusSortFn;
@@ -125,64 +142,63 @@ export const TaskTable = ({ data, columns }) => {
 
     return (
         <div ref={parentRef} className={styles.table_wrapper} style={{ height: "500px" }}>
-            {/* <div className={styles.table_wrapper} style={{ height: `${virtualizer.getTotalSize()}px`}}> */}
-            {/* <div className={styles.table_wrapper} style={{height:"400px"}}> */}
-
-            <table className={styles.table}>
-                <thead>
-                    {table.getHeaderGroups().map((HeaderGroup) => (
-                        <tr className={styles.tr} key={HeaderGroup.id}>
-                            {HeaderGroup.headers.map((header) => (
-                                <th className={styles.th} style={{ width: header.getSize() }} key={header.id}>
-                                    <div>
+            <div style={{ height: `${virtualizer.getTotalSize()}px` }}>
+                <table className={styles.table}>
+                    <thead>
+                        {table.getHeaderGroups().map((HeaderGroup) => (
+                            <tr className={styles.tr} key={HeaderGroup.id}>
+                                {HeaderGroup.headers.map((header) => (
+                                    <th className={styles.th} style={{ width: header.getSize() }} key={header.id}>
                                         <div>
-                                            <span onClick={header.column.getToggleSortingHandler()}>
-                                                {header.column.columnDef.header}
-                                            </span>
-                                            {
+                                            <div>
+                                                <span onClick={header.column.getToggleSortingHandler()}>
+                                                    {header.column.columnDef.header}
+                                                </span>
                                                 {
-                                                    asc: " 🔼",
-                                                    desc: " 🔽",
-                                                }[header.column.getIsSorted()]
-                                            }
-                                        </div>
+                                                    {
+                                                        asc: " 🔼",
+                                                        desc: " 🔽",
+                                                    }[header.column.getIsSorted()]
+                                                }
+                                            </div>
 
-                                        <div>
-                                            <Filters
-                                                columnFilters={columnFilters}
-                                                setColumnFilters={setColumnFilters}
-                                                columnId={header.column.id}
-                                            />
+                                            <div>
+                                                <Filters
+                                                    columnFilters={columnFilters}
+                                                    setColumnFilters={setColumnFilters}
+                                                    columnId={header.column.id}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody>
-                    {virtualizer.getVirtualItems().map((virtualRow, index) => {
-                        const row = rows[virtualRow.index];
-                        return (
-                            <tr
-                                key={row.id}
-                                style={{
-                                    height: `${virtualRow.size}px`,
-                                    transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
-                                }}
-                            >
-                                {row.getVisibleCells().map((cell) => {
-                                    return (
-                                        <td key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
-                                    );
-                                })}
+                                    </th>
+                                ))}
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                        ))}
+                    </thead>
+                    <tbody>
+                        {virtualizer.getVirtualItems().map((virtualRow, index) => {
+                            const row = rows[virtualRow.index];
+                            return (
+                                <tr
+                                    key={row.id}
+                                    style={{
+                                        height: `${virtualRow.size}px`,
+                                        transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+                                    }}
+                                >
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <td key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
