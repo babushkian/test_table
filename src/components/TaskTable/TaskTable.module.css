@@ -19,17 +19,10 @@
 }
 
 
-/* th {
-    background-color: darkslategray;
-    color: white;
-    font-weight: bold;
-    boxShadow: inset 0 0 0 1px #424242;
-} */
 
 .td {
     background-color:azure;
     color: black;
-    box-shadow: inset 0 0 0 1px #424242;
 }
 
 .th {
@@ -45,3 +38,12 @@
     text-transform: uppercase;
     text-align: center;
   }
+  
+.container {
+    margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}

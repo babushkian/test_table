@@ -1,13 +1,12 @@
 import { useMemo, useRef, useState } from "react";
 import {flexRender, getCoreRowModel, useReactTable, getFilteredRowModel, filterFns, getSortedRowModel, getPaginationRowModel } from "@tanstack/react-table";
+import { useVirtualizer } from '@tanstack/react-virtual';
 import styles from "./TaskTable.module.css"
 // import DATA from "../../../data.js";
 // import DATA from "../../../fake_dataset.js";
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
 import { Filters } from "../Filters/Filters.jsx"
-
-
 
 
 // const columns = [
@@ -35,7 +34,8 @@ import { Filters } from "../Filters/Filters.jsx"
 //     },
 // ];
 
-
+// Функция для фильтрации по солбцам. Обычная фильтрация не сработала, так как она не умеет фильтровать по числам
+// мне нужно, чтобы числа фильтровались так же как и строки
 const defaultFilter = (row, columnId, filterValue) => {
     const filterValueLower = String(filterValue).toLowerCase();
     const valueString = String(row.getValue(columnId));
@@ -45,7 +45,7 @@ const defaultFilter = (row, columnId, filterValue) => {
     return valueString.toLowerCase().includes(filterValueLower);
 }
 
-
+// функция для кастомной сортировки по статусам
 const statusSortFn = (rowA, rowB, _columnId) => {
     const statusA = rowA.original.status
     const statusB = rowB.original.status
@@ -58,14 +58,14 @@ export const TaskTable = ({data, columns}) => {
     const [tabledata, setData] = useState(data);
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
-    const [pagination, setPagination] = useState({pageSize: 10, pageIndex: 0})
+    const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
+    const parentRef = useRef(null)
 
-    console.log("порядок колонок:", columns)
+
     const defineColumns = () => Object.keys(columns).map(key=>{
         const sortableColumn = key ==="remark" ? false: true 
-        
-        
-        const columnDict = { accessorKey: key, 
+        const columnDict = { 
+            accessorKey: key, 
             header: columns[key], 
             cell: (props) => <span>{props.getValue()}</span>,
             filterFn: defaultFilter,
@@ -99,7 +99,7 @@ export const TaskTable = ({data, columns}) => {
         //        (row, index) => index === rowIndex? {...prev[rowIndex], [columnId]: value} : row
         //     ))
         // }
-        // debugTable: true,
+        debugTable: true,
         // debugHeaders: true,
         // debugColumns: false,
      });
@@ -108,7 +108,7 @@ export const TaskTable = ({data, columns}) => {
     // console.log("таблица", table.getHeaderGroups()[0])
 
     return (
-            <>
+            <div ref={parentRef} className={styles.container}>
             
             <table className={styles.table} style={{ width: table.getTotalSize()}}>
                 <thead>
@@ -152,6 +152,6 @@ export const TaskTable = ({data, columns}) => {
                 <button onClick={table.nextPage} disabled={!table.getCanNextPage()}> &gt; </button>
             </div>
             
-        </>
+        </div>
     );
 };
