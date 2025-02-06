@@ -40,7 +40,7 @@ const App = () => {
             <h1>Выберите даты для формирования отчёта</h1>
             <DateDiapazon onSubmit={handleDatesSubmit} setParentDates={setParentDates}/>
             {loading && <p>Загрузка...</p>}
-            {data?.data  && !loading && <TaskTable data={data.data} columns={data.columns} />}
+            {data?.data  && !loading && <TaskTable tabledata={data.data} columns={data.columns} />}
         </div>
 
     );

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -60,17 +60,17 @@ const statusSortFn = (rowA, rowB, _columnId) => {
     return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
 };
 
-export const TaskTable = ({ data, columns }) => {
-    const [tabledata, setData] = useState(data);
+export const TaskTable = ({ tabledata, columns }) => {
+    const [data, setData] = useState(tabledata);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
-    const [cellEditing, setCellEditing] = useState({rowIndex: null, columnId: null})
+    const [cellEditing, setCellEditing] = useState({ rowIndex: null, columnId: null });
     // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
     const parentRef = useRef(null);
 
     const handleEdit = (rowIndex, columnId) => {
-        setCellEditing({rowIndex, columnId})
-    }
+        setCellEditing({ rowIndex, columnId });
+    };
 
     const defineColumns = () =>
         Object.keys(columns).map((key) => {
@@ -82,20 +82,21 @@ export const TaskTable = ({ data, columns }) => {
                 enableSorting: sortableColumn,
                 cell: (props) => <span>{props.getValue()}</span>,
                 // я хочу сделать редер, чтобы при нажатии в ячейке появлялась трока ввода, в остальных случаях просто текст
-                // не рендерится, уходит в бесконечную загрузку                    
+                // не рендерится, уходит в бесконечную загрузку
                 // cell: ({row, column, getValue}) =>{
                 //     const isEditing  = cellEditing.rowIndex === row.original.id && cellEditing.columnId === column.id;
                 //     return isEditing? (
-                //         <input></input>    
+                //         <input></input>
                 //     ) : (
                 //         <span onclick={handleEdit(row.original.id, column.id)} >{getValue()}</span>
                 //     )
-                //} 
-
-
+                //}
             };
             if (key === "status") {
                 columnDict["sortingFn"] = statusSortFn;
+            }
+            if (key === "controller") {
+                columnDict["cell"] = EditableCell;
             }
 
             return columnDict;
@@ -103,9 +104,11 @@ export const TaskTable = ({ data, columns }) => {
 
     // чтобы заголовок не перерисовывался в случае обновления data
     const table_columns = useMemo(defineColumns, []); //не зависимостей, будет отрисован один раз
+    useEffect(() => console.log("данные изменились"), [data])
+
 
     const table = useReactTable({
-        data: data,
+        data,
         columns: table_columns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
@@ -120,12 +123,27 @@ export const TaskTable = ({ data, columns }) => {
             //pagination, // нужно именно так называть переменную, иначе он не присваивает ей новые значения
         },
 
-        // meta: {
-        //     updateData: (rowIndex, columnId, value)=> setData(prev => prev.map(
-        //        (row, index) => index === rowIndex? {...prev[rowIndex], [columnId]: value} : row
-        //     ))
-        // }
-        debugTable: true,
+        meta: {
+            // функция почему то не изменяет объект. И уж тем более значения в рядах
+            // после скролла инпуты рендерятся заново и у них старые значения
+            updateData: (rowIndex, columnId, value) => {
+                console.log("изменяем значение ячейки");
+                console.log("ряд:", rowIndex, "столбец:", columnId, "новое значение:", value);
+
+                setData((prev) =>
+                    prev.map((row, index) => {
+                        if (index === rowIndex) {
+                            console.log("в этом мсте должно происходить присваивание", index, rowIndex);
+                            const newRow = { ...prev[rowIndex], [columnId]: value };
+                            console.log("измененный объeкт:", newRow);
+                            return newRow;
+                        }
+                        return row;
+                    })
+                );
+            },
+        },
+        // debugTable: true,
         // debugHeaders: true,
         // debugColumns: false,
     });
@@ -137,8 +155,8 @@ export const TaskTable = ({ data, columns }) => {
         estimateSize: () => 15,
         overscan: 10,
     });
-    console.log(rows);
-    console.log(virtualizer);
+    console.log(rows.slice(0, 5));
+    console.log(data.slice(0, 5));
 
     return (
         <div ref={parentRef} className={styles.table_wrapper} style={{ height: "500px" }}>
