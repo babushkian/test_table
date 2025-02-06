@@ -64,7 +64,7 @@ export const TaskTable = ({ tabledata, columns }) => {
     const [data, setData] = useState(tabledata);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
-    const [cellEditing, setCellEditing] = useState({ rowIndex: null, columnId: null });
+    // const [cellEditing, setCellEditing] = useState({ rowIndex: null, columnId: null });
     // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
     const parentRef = useRef(null);
 
@@ -81,16 +81,8 @@ export const TaskTable = ({ tabledata, columns }) => {
                 filterFn: defaultFilter,
                 enableSorting: sortableColumn,
                 cell: (props) => <span>{props.getValue()}</span>,
-                // я хочу сделать редер, чтобы при нажатии в ячейке появлялась трока ввода, в остальных случаях просто текст
-                // не рендерится, уходит в бесконечную загрузку
-                // cell: ({row, column, getValue}) =>{
-                //     const isEditing  = cellEditing.rowIndex === row.original.id && cellEditing.columnId === column.id;
-                //     return isEditing? (
-                //         <input></input>
-                //     ) : (
-                //         <span onclick={handleEdit(row.original.id, column.id)} >{getValue()}</span>
-                //     )
-                //}
+                // cell: EditableCell,
+
             };
             if (key === "status") {
                 columnDict["sortingFn"] = statusSortFn;
@@ -124,8 +116,6 @@ export const TaskTable = ({ tabledata, columns }) => {
         },
 
         meta: {
-            // функция почему то не изменяет объект. И уж тем более значения в рядах
-            // после скролла инпуты рендерятся заново и у них старые значения
             updateData: (rowIndex, columnId, value) => {
                 console.log("изменяем значение ячейки");
                 console.log("ряд:", rowIndex, "столбец:", columnId, "новое значение:", value);

@@ -23,6 +23,7 @@
     backface-visibility: hidden; */
     background-color:azure;
     color: black;
+    padding: 0;
 }
 
 .th {
@@ -35,7 +36,10 @@
     text-transform: uppercase;
     text-align: center;
   }
-  
+
+td div {
+    padding: 6px;
+}
   
 .container {
     margin: 1rem auto;
