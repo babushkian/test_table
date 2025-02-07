@@ -5,6 +5,7 @@ export function EditableCell({ getValue, row, column, table }) {
     const initialValue = getValue();
     const [value, setValue] = useState(initialValue);
     const [editing, setEditing] = useState(false);
+    // ссылка на строку ввода во время редактирования
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -19,24 +20,26 @@ export function EditableCell({ getValue, row, column, table }) {
         // это нужно для переключения ячейки из режима ввода в режим просмотра
         const handleClickOutside = (event) => {
             if (inputRef.current && !inputRef.current.contains(event.target)) {
-                onBlur();
+                inputRef.current.blur()
             }
         };
         // создается глобальный слушатель кликов мышкой
         document.addEventListener("mousedown", handleClickOutside);
-
+        // очистка слушателя при перед следующим запуском  useEffect
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [editing]);
 
-    const onBlur = () => {
-        table.options.meta?.updateData(row.index, column.id, value);
+    const onBlur = (event) => {
+        console.log("Покинули ячейку, значение должно измениться")
+        table.options.meta?.updateData(row.index, column.id, value );
         setEditing(false);
     };
     const handleEnterDown = (e) => {
         if (e.key === "Enter") e.target.blur();
     };
+
 
     return editing ? (
         <div className={styles[("cell_regular", "focused")]}>
