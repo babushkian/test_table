@@ -14,6 +14,9 @@ import styles from "./TaskTable.module.css";
 // import DATA from "../../../fake_dataset.js";
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
+import { OptionsCell } from "../OptionsCell/OptionsCell.jsx";
+
+
 import { Filters } from "../Filters/Filters.jsx";
 
 // const columns = [
@@ -90,13 +93,16 @@ export const TaskTable = ({ tabledata, columns }) => {
             if (key === "controller") {
                 columnDict["cell"] = EditableCell;
             }
+            // if (key === "status") {
+            //     columnDict["cell"] = OptionsCell;
+            // }
+
 
             return columnDict;
         });
 
     // чтобы заголовок не перерисовывался в случае обновления data
     const table_columns = useMemo(defineColumns, []); //не зависимостей, будет отрисован один раз
-    useEffect(() => console.log("данные изменились"), [data])
 
 
     const table = useReactTable({
