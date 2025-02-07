@@ -2,26 +2,40 @@ import { useEffect, useState, useRef } from "react"
 import styles from "./OptionsCell.module.css"
 
 
-const dropdownOptions = {1: "сделано", 2: "отменено", 3: "в процессе", 4:"ожидает"}
+const dropdownOptions = ["сделано", "отменено", "в процессе", "ожидает"]
 
 
 export function OptionsCell({getValue, row, column, table}) {
-    const initialValue = getValue();
-    const [value, setValue] = useState(initialValue)
+
     const [editing, setEditing] = useState(false)
-    const inputRef = useRef(null);
+    const selectRef = useRef(null);
     
-    useEffect(()=>{setValue(initialValue)}, [initialValue])
 
     useEffect(() => {
-        if (editing && inputRef.current) {
-            console.log(inputRef.current)
-            inputRef.current.focus();
-        }
-    })
+        if (editing && selectRef.current) {
+            selectRef.current.focus();
 
-    const onChange = () =>{
-        table.options.meta?.updateData(row.index, column.id, value)
+        }
+
+        const handleClickOutside = (event) => {
+            if (selectRef.current && !selectRef.current.contains(event.target)) {
+                onChange(event)
+            }
+        };
+        // создается глобальный слушатель кликов мышкой когда ячейка входит в режим редактирования
+        if (editing) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        // очистка слушателя при перед следующим запуском  useEffect
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+
+    }, [editing])
+
+    const onChange = (event) =>{
+        const odlValue=getValue()
+        table.options.meta?.updateData(row.index, column.id, event.target.value ?? odlValue)
         setEditing(false)
     }
 
@@ -30,12 +44,11 @@ export function OptionsCell({getValue, row, column, table}) {
     return ( editing ? (
                 
                     <select className={styles["cell_select"]} 
-                        ref = {inputRef}
-                        
-                        value = {value} 
+                        ref = {selectRef}
+                        defaultValue = {getValue()} 
                         onChange={onChange}
                      >
-                        {Object.entries( dropdownOptions).map(([key, status]) => <option key={key} value={status} >{status}</option>)}
+                        {dropdownOptions.map((status, index) => <option key={index} value={status} >{status}</option>)}
                     </select>
                 
                 ) : (

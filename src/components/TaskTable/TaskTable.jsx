@@ -88,9 +88,9 @@ export const TaskTable = ({ tabledata, columns }) => {
             // if (key === "controller") {
             //     columnDict["cell"] = EditableCell;
             // }
-            // if (key === "status") {
-            //     columnDict["cell"] = OptionsCell;
-            // }
+            if (key === "status") {
+                columnDict["cell"] = OptionsCell;
+            }
 
 
             return columnDict;
