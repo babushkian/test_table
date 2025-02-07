@@ -30,7 +30,8 @@
     border: 1px solid black;
     justify-content: center;
     align-items: center;
-    color: gray.400;
+    color: white;
+    background-color: rgb(55, 70, 102);
     padding: 0.5rem;
     font-weight:600;
     text-transform: uppercase;

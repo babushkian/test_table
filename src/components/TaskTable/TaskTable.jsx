@@ -11,7 +11,7 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import styles from "./TaskTable.module.css";
 // import DATA from "../../../data.js";
-// import DATA from "../../../fake_dataset.js";
+
 
 import { EditableCell } from "../EditableCell/EditableCell.jsx";
 import { OptionsCell } from "../OptionsCell/OptionsCell.jsx";
@@ -67,13 +67,8 @@ export const TaskTable = ({ tabledata, columns }) => {
     const [data, setData] = useState(tabledata);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
-    // const [cellEditing, setCellEditing] = useState({ rowIndex: null, columnId: null });
     // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
     const parentRef = useRef(null);
-
-    const handleEdit = (rowIndex, columnId) => {
-        setCellEditing({ rowIndex, columnId });
-    };
 
     const defineColumns = () =>
         Object.keys(columns).map((key) => {
@@ -83,16 +78,16 @@ export const TaskTable = ({ tabledata, columns }) => {
                 header: columns[key],
                 filterFn: defaultFilter,
                 enableSorting: sortableColumn,
-                cell: (props) => <span>{props.getValue()}</span>,
-                // cell: EditableCell,
+                // cell: (props) => <span>{props.getValue()}</span>,
+                cell: EditableCell,
 
             };
             if (key === "status") {
                 columnDict["sortingFn"] = statusSortFn;
             }
-            if (key === "controller") {
-                columnDict["cell"] = EditableCell;
-            }
+            // if (key === "controller") {
+            //     columnDict["cell"] = EditableCell;
+            // }
             // if (key === "status") {
             //     columnDict["cell"] = OptionsCell;
             // }
