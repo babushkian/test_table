@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
+    "corsheaders", # разрешает CORS
     'rest_framework',
     'drf_spectacular',
     'worklist',
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware", # подключается middleware для CORS
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -127,10 +128,36 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CORS_ALLOW_CREDENTIALS = True  # разрешает отправку cookies, в том числе JWT-токена через них
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173'] # разрешенные хосты для CORS
+
+# настройки для HttpOnly куки для JWT, чтоб они передавались
+CSRF_COOKIE_HTTPONLY = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173",]
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',  # Включает веб-интерфейс
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': ( # как будем аутентифицироваться
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    # акстомная аутертификация черех токен в куках
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'api.authentication.CookieJWTAuthentication',
+    # ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+from datetime import timedelta
+SIMPLE_JWT = { # почти все настройки совпадают с настройками по умолчанию
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=10),
+    "ROTATE_REFRESH_TOKENS": False,  # Обновлять refresh-токен при каждом обновлении //нужна база для этого
+    "BLACKLIST_AFTER_ROTATION": False,  # Блокировать старый refresh-токен  //нужна база для этого
+    "AUTH_COOKIE": "access_token",
+    "AUTH_COOKIE_REFRESH": "refresh_token",
+    "AUTH_COOKIE_SECURE": False,  # Используйте True в продакшене (HTTPS)
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "Lax",
 }
