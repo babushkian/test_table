@@ -10,14 +10,14 @@ from .token_authentication import CookieTokenObtainPairView, CookieTokenRefreshV
 urlpatterns = [
 	path('records/', RecordView.as_view(), name='records'),
 
-	# path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-	# path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-	#
+	path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+	path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
 
 
 	# кастомные представления для работы с JWT через HTTPOnly COOKIE
-    path("api/token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
-    path("api/logout/", LogoutView.as_view(), name="logout"),
+    # path("api/token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # path("api/token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
+    # path("api/logout/", LogoutView.as_view(), name="logout"),
 
 ]

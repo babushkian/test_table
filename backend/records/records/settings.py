@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders", # разрешает CORS
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
     'worklist',
     'api',
 ]
@@ -140,16 +141,20 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',  # Включает веб-интерфейс
     ],
-    # кaстомная аутертификация черех токен в куках
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'api.authentication.CookieJWTAuthentication',
-    ),
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # эта аутентификация через токен в защищенных куках. Способ, который пытался сделать Максим.
+        # не получилось, так как защищенные куки передаются очень капризно
+        #'api.authentication.CookieJWTAuthentication',
+        # лучше воспользоваться стандартной аутентификацией через токен в заголовках
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 from datetime import timedelta
 SIMPLE_JWT = {  # почти все настройки совпадают с настройками по умолчанию
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=1),
     "ROTATE_REFRESH_TOKENS": False,  # Обновлять refresh-токен при каждом обновлении //нужна база для этого
     "BLACKLIST_AFTER_ROTATION": False,  # Блокировать старый refresh-токен  //нужна база для этого
     "AUTH_COOKIE": "access_token",

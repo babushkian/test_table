@@ -14,10 +14,14 @@ from api.models import Record
 #     permission_classes = [permissions.AllowAny ]
 #     serializer_class = RecordSerializer
 #     queryset = Record.objects.all()
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+
 
 
 class RecordView(GenericAPIView):
-    authentication_classes = []  # Использует глобальные настройки
+    authentication_classes = [JWTAuthentication]  # можно не указывать, если определены глобальные настройки в settings.py
     permission_classes = [IsAuthenticated]  # Требует аутентификации
     # permission_classes = [permissions.AllowAny ]
     serializer_class = RecordSerializer
@@ -25,7 +29,7 @@ class RecordView(GenericAPIView):
 
     @extend_schema(parameters=[
         OpenApiParameter(name='start_date', description='Начальная дата', required=False, type=OpenApiTypes.DATE, default="2025-01-01"),
-        OpenApiParameter(name='end_date', description='Конечная дата', required=False, type=OpenApiTypes.DATE, default="2025-01-08")
+        OpenApiParameter(name='end_date', description='Конечная дата', required=False, type=OpenApiTypes.DATE, default="2025-02-08")
     ],
                    description='Отправляет список заданий за определенный период времени.',
                    examples=[
