@@ -153,8 +153,8 @@ REST_FRAMEWORK = {
 }
 from datetime import timedelta
 SIMPLE_JWT = {  # почти все настройки совпадают с настройками по умолчанию
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(hours=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=12),
     "ROTATE_REFRESH_TOKENS": False,  # Обновлять refresh-токен при каждом обновлении //нужна база для этого
     "BLACKLIST_AFTER_ROTATION": False,  # Блокировать старый refresh-токен  //нужна база для этого
     "AUTH_COOKIE": "access_token",

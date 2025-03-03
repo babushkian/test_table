@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Login.module.css";
+
 export const Login = () => {
     const [autorized, setAutorized] = useState(false);
+    const [authToken, setAuthToken] = useState(null);
+    const [refreshToken, setRefreshToken] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
 
     const handleLogin = async () => {
         try {
@@ -14,8 +18,11 @@ export const Login = () => {
 
             // Проверка успешности логина
             if (response.data) {
+                console.log(response.data)
                 setAutorized(true);
-                console.log(response.data);
+                setAuthToken(response.data.access);
+                setRefreshToken(response.data.refresh);
+                localStorage.setItem("refesh", response.data.refresh);
             } else {
                 alert("Login failed: " + response.data.message);
             }
@@ -25,23 +32,27 @@ export const Login = () => {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            // Отправка POST-запроса на сервер с использованием axios
-            const response = await axios.post('http://127.0.0.1:8000/api/logout/', {});
-            console.log(response.data);
-            setAutorized(false);
-        } catch (error) {
-            console.error("Error during logging out :", error);
-            alert("An error occurred during logging out.");
+    useEffect(()=>{
+        if(refreshToken){
+            setAutorized(true)
+        } else {
+            setAutorized(false)
         }
+    },[refreshToken])
+
+    const handleLogout = async () => {
+        setAuthToken(null);
+        setRefreshToken(null);
+        localStorage.removeItem("refesh");
+
     };
 
     const getPrograms = async () => {
         try {
-            const response = await axios.get("http://127.0.0.1:8000/api/get_programs", {
+            const response = await axios.get("http://127.0.0.1:8000/api/records/", {
                 withCredentials: true,
                 params: { start_date: "2025-02-01", end_date: "2025-02-05" },
+                headers: { Authorization: `Bearer ${authToken}` },
             });
 
             console.log("Protected data:", response.data);
@@ -51,6 +62,17 @@ export const Login = () => {
     };
 
     const label = autorized ? <div>Авторизован</div> : <div>Не авторизован</div>;
+
+    async function getUserInfo() {
+        const response = await axios.get("http://127.0.0.1:8000/api/show/", {
+            headers: { Authorization: `Bearer ${authToken}` },
+        });
+        if (response.data) {
+            setUserInfo(response.data);
+        }
+    }
+
+    useEffect(() => {console.log(userInfo)}, [userInfo])
 
     return (
         <>
@@ -66,7 +88,11 @@ export const Login = () => {
                 </div>
 
                 <div>
-                    <button onClick={getPrograms}>Получить данные</button>
+                    <button onClick={getUserInfo}>Сведения о пользователе</button> <div>{userInfo?.user}</div> 
+                </div>
+                
+                <div>
+                    <button onClick={getPrograms}>Получить данные</button> 
                 </div>
             </div>
             {label}

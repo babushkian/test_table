@@ -72,3 +72,11 @@ class RecordView(GenericAPIView):
 
 
 
+
+class ShowUserView(GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        print(request.user)
+        return Response({"user": str(request.user)})

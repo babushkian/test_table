@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from api.views import RecordView
+from api.views import RecordView, ShowUserView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -9,6 +9,8 @@ from .token_authentication import CookieTokenObtainPairView, CookieTokenRefreshV
 
 urlpatterns = [
 	path('records/', RecordView.as_view(), name='records'),
+	path('show/', ShowUserView.as_view(), name='show'),
+
 
 	path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 	path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
