@@ -23,6 +23,7 @@ export const Login = () => {
                 setAuthToken(response.data.access);
                 setRefreshToken(response.data.refresh);
                 localStorage.setItem("refesh", response.data.refresh);
+                localStorage.setItem("access", response.data.access);
             } else {
                 alert("Login failed: " + response.data.message);
             }
@@ -48,11 +49,17 @@ export const Login = () => {
     };
 
     const getPrograms = async () => {
+       let access;
+        if (!authToken) {
+        access = localStorage.getItem("access");
+    } else {
+        access = authToken
+    }
         try {
             const response = await axios.get("http://127.0.0.1:8000/api/records/", {
                 withCredentials: true,
                 params: { start_date: "2025-02-01", end_date: "2025-02-05" },
-                headers: { Authorization: `Bearer ${authToken}` },
+                headers: { Authorization: `Bearer ${access}` },
             });
 
             console.log("Protected data:", response.data);

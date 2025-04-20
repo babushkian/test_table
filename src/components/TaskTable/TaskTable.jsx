@@ -69,13 +69,13 @@ export const TaskTable = ({ tabledata, columns }) => {
     const [columnFilters, setColumnFilters] = useState([]);
     // const [pagination, setPagination] = useState({pageSize: 15, pageIndex: 0})
     const parentRef = useRef(null);
-
+    console.log("колонки", columns)
     const defineColumns = () =>
         Object.keys(columns).map((key) => {
             const sortableColumn = key === "remark" ? false : true;
             const columnDict = {
                 accessorKey: key,
-                header: columns[key],
+                header: key,
                 filterFn: defaultFilter,
                 enableSorting: sortableColumn,
                 // cell: (props) => <span>{props.getValue()}</span>,

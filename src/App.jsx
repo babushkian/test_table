@@ -26,20 +26,23 @@ const App = () => {
         setLoading(true);
         try {
             const response = await getRawData(convertDate(dates.startDate), convertDate(dates.endDate));
-            setData(response.data);
+            console.log(response.data);
+            if (response.data) setData(response.data);
         } catch (err) {
             console.error("Ошибка при получении данных:", err);
         } finally {
             setLoading(false);
         }
     }
-  
+    
+    
+    console.log("данные", data);
     return (
         <div className="App">
             <h1>Выберите даты для формирования отчёта</h1>
             < DateDiapazon onSubmit={handleDatesSubmit} setParentDates={setParentDates} />
             {loading && <p>Загрузка...</p>}
-            {data?.data  && !loading && < TaskTable tabledata={data.data} columns={data.columns} />}
+            {data && !loading && <TaskTable tabledata={data} columns={data[0]} />}
         </div>
 
     );

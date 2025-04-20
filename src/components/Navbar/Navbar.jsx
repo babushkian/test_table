@@ -12,10 +12,6 @@ export const Navbar = () => {
                 <li>
                     <Link  className={styles.navlink} to="/login">Логин</Link>
                 </li>
-                <li>
-                    <Link  className={styles.navlink} to="/plasma">Плазма</Link>
-                </li>
-
             </ul>
         </nav>
         <Outlet/>

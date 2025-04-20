@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'djoser',
     'worklist',
     'api',
 ]
@@ -154,12 +156,9 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 SIMPLE_JWT = {  # почти все настройки совпадают с настройками по умолчанию
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=12),
-    "ROTATE_REFRESH_TOKENS": False,  # Обновлять refresh-токен при каждом обновлении //нужна база для этого
-    "BLACKLIST_AFTER_ROTATION": False,  # Блокировать старый refresh-токен  //нужна база для этого
-    "AUTH_COOKIE": "access_token",
-    "AUTH_COOKIE_REFRESH": "refresh_token",
-    "AUTH_COOKIE_SECURE": False,  # Используйте True в продакшене (HTTPS)
-    "AUTH_COOKIE_HTTP_ONLY": True,
-    "AUTH_COOKIE_SAMESITE": "None",
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ROTATE_REFRESH_TOKENS": True,  # Обновлять refresh-токен при каждом обновлении //нужна база для этого
+    "BLACKLIST_AFTER_ROTATION": True,  # Блокировать старый refresh-токен  //нужна база для этого
+    'AUTH_HEADER_TYPES': ('Bearer',),
+
 }
