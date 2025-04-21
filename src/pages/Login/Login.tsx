@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "./Login.module.css";
 
 import { userActions, UserType } from "../../store/userSlice";
 
 import { Box, Button, Container, Typography } from "@mui/material";
+import { useAuth } from "../../hooks/use-auth";
 
 export function Login() {
   const [autorized, setAutorized] = useState(false);
   const [authToken, setAuthToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
+
+  const authContext = useAuth();
+  if (!authContext) {
+    throw new Error("Ошибка при авторизации");
+  }
+  const { login } = authContext;
 
   const writeTokens = (data) => {
     console.log(data);
@@ -31,6 +37,7 @@ export function Login() {
       );
       // Проверка успешности логина
       if (response.data) {
+        login(response.data.access);
         console.log(response.data);
         writeTokens(response.data);
         setAutorized(true);

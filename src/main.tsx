@@ -13,6 +13,8 @@ import { Provider } from "react-redux";
 import { Login } from "./pages/Login";
 
 import { Navbar } from "./pages/Navbar";
+import { AuthProvider } from "./context/AuthContext";
+import { setupInterceptors } from "./utils/urls";
 
 const router = createBrowserRouter([
   {
@@ -24,14 +26,16 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
+setupInterceptors();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router}></RouterProvider>
+      <AuthProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </AuthProvider>
     </Provider>
   </React.StrictMode>,
 );

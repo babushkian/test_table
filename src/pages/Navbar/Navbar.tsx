@@ -1,9 +1,15 @@
 import { Link, Outlet } from "react-router";
 import styles from "./Navbar.module.css";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useAuth } from "../../hooks/use-auth";
 export function Navbar() {
-  const currentUser = useSelector((state: RootState) => state);
+  const authorization = useAuth();
+
+  if (!authorization) {
+    throw new Error("Ошибка при авторизации");
+  }
+
+  const { currentUser } = authorization;
+
   return (
     <>
       <nav>
@@ -21,7 +27,7 @@ export function Navbar() {
           <li className={styles["long-space"]}>
             <div></div>
           </li>
-          <li>{currentUser?.user?.username}</li>
+          <li>{currentUser?.username}</li>
         </ul>
       </nav>
       <Outlet />
